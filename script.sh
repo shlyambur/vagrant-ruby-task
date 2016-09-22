@@ -7,7 +7,7 @@ if [[ "$(cat $filetxt | grep "$linetxt")" != *"$linetxt" ]]
 then
         echo "$linetxt" | sudo tee --append /etc/apt/sources.list #> /dev/null
 else
-        exit
+        end
 fi
 set +x
 
