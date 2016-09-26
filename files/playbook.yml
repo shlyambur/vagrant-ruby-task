@@ -3,35 +3,42 @@
   tasks:
 
   - name: Install the rbenv and Ruby dependencies
-    apt: name={{item}} update_cache=yes
-      with_items:
-         - git-core
-         - curl
-         - zlib1g-dev
-         - build-essential
-         - libssl-dev
-         - libreadline-dev
-         - libyaml-dev
-         - libsqlite3-dev
-         - sqlite3
-         - libxml2-dev
-         - libxslt1-dev
-         - libcurl4-openssl-dev
-         - python-software-properties
-         - libffi-dev
+    apt: name={{ item }} update_cache=yes
+    with_items:
+       - git-core
+       - curl
+       - zlib1g-dev
+       - build-essential
+       - libssl-dev
+       - libreadline-dev
+       - libyaml-dev
+       - libsqlite3-dev
+       - sqlite3
+       - libxml2-dev
+       - libxslt1-dev
+       - libcurl4-openssl-dev
+       - python-software-properties
+       - libffi-dev
     sudo: yes
- 
+
   - name: Install rbenv
     git: repo=git://github.com/sstephenson/rbenv.git
       dest="$HOME/.rbenv"
-    copy: content="{{ export PATH="$HOME/.rbenv/bin:$PATH" }}" dest="$HOME/.bash_profile" 
-    copy: content="{{ eval "$(rbenv init -)" }}" dest="$HOME/.bash_profile"
+    sudo: yes  
+
+  - name: Copy rbenv
+    shell: echo 'export PATH="$HOME/.rbenv/bin:$PATH"' >> "$HOME/.bash_profile"
+    shell: echo 'eval "$(rbenv init -)"' >> "$HOME/.bash_profile"
+
+  - name: Install pluging rbenv
     git: repo=git://github.com/sstephenson/ruby-build.git
       dest="$HOME/.rbenv/plugins/ruby-build"
-    copy: content="{{ export PATH="$HOME/.rbenv/plugins/ruby-build/bin:$PATH" }}" dest="$HOME/.bash_profile"
-    command: source "$HOME/.bash_profile"
-
-
-  - name: Starting nginx service
-    service: name=nginx state=started
     sudo: yes
+
+  - name: Install rbenv
+    shell: echo 'export PATH="$HOME/.rbenv/plugins/ruby-build/bin:$PATH"' >> "$HOME/.bash_profile"
+
+  - name: command rbenv
+    shell: source "$HOME/.bash_profile"
+    args:
+      executable: /bin/bash
