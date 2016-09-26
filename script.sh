@@ -1,34 +1,26 @@
 #!/bin/bash
-
 set -x
-filetxt=/etc/apt/sources.list
-linetxt="deb http://download.virtualbox.org/virtualbox/debian trusty contrib"
-if [[ "$(cat $filetxt | grep "$linetxt")" != *"$linetxt" ]]
-then
-        echo "$linetxt" | sudo tee --append /etc/apt/sources.list #> /dev/null
-else
-        end
-fi
-set +x
 
-sudo apt-get update
-sudo apt-get -y install virtualbox-5.1 --force-yes
+#GIT install
+#sudo apt-get update
+#sudo apt-get install -y git
 
-if [ "$(sudo getconf LONG_BIT)" = 32 ];
+# Checking if there are particular vagrant box and update it if it's needed
+if [[ $"(vagrant box list | grep trusty64)" == *"trusty64"* ]]
 then
-        curl "https://releases.hashicorp.com/vagrant/1.8.5/vagrant_1.8.5_i686.deb" -o "/tmp/vagrant_1.8.5_i686.deb"
-        sudo dpkg -i /tmp/vagrant_1.8.5_i686.deb
+	vagrant box update --box ubuntu/trusty64
 else
-        curl "https://releases.hashicorp.com/vagrant/1.8.5/vagrant_1.8.5_x86_64.deb" -o "/tmp/vagrant_1.8.5_x86_64.deb"
-        sudo dpkg -i /tmp/vagrant_1.8.5_x86_64.deb
+        vagrant box add ubuntu/trusty64
 fi
 
-set +x
+# Copy Vagrantfile and ansible files to vagrant share folder
+##cp /files/Vagrantfile  ~/vagrant/node01/Vagrantfile
+##cp /files/playbook.yml ~/vagrant/node01/playbook.yml
+mkdir -p ~/vagrant/node01
+cp /files/* ~/vagrant/node01/
 
-vagrant box add ubuntu/trusty64
-mkdir ~/vagrant/vm/node01
-cd ~/vagrant/vm/node01
-vagrant init ubuntu/trusty64
+# Starting and conecting to VM
+cd ~/vagrant/node01
 vagrant up
 vagrant ssh
 
