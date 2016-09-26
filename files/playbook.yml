@@ -40,3 +40,12 @@
     shell: source $HOME/.bash_profile
     args:
       executable: /bin/bash
+  
+  - name: Install Ruby
+    shell: rbenv install -v 2.2.3 && rbenv global 2.2.3
+
+  - name: Install
+    shell: echo "gem: --no-document" > ~/.gemrc && gem install bundler
+
+  - name: Install Reils
+    shell: gem install rails
