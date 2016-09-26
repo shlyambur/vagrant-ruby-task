@@ -1,6 +1,5 @@
 ---
-- hosts: experiments
-  tasks:
+- tasks:
 
   - name: Install nginx package
     apt: name=nginx update_cache=yes
