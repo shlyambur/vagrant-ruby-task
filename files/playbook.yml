@@ -22,23 +22,21 @@
     sudo: yes
 
   - name: Install rbenv
-    git: repo=git://github.com/sstephenson/rbenv.git
-      dest="$HOME/.rbenv"
-    sudo: yes  
-
-  - name: Copy rbenv
-    shell: echo 'export PATH="$HOME/.rbenv/bin:$PATH"' >> "$HOME/.bash_profile"
-    shell: echo 'eval "$(rbenv init -)"' >> "$HOME/.bash_profile"
+    git: repo=git://github.com/sstephenson/rbenv.git dest="$HOME/.rbenv"
 
   - name: Install pluging rbenv
-    git: repo=git://github.com/sstephenson/ruby-build.git
-      dest="$HOME/.rbenv/plugins/ruby-build"
-    sudo: yes
+    git: repo=git://github.com/sstephenson/ruby-build.git dest="$HOME/.rbenv/plugins/ruby-build"
 
-  - name: Install rbenv
+  - name: Copy1
+    shell: echo 'export PATH="$HOME/.rbenv/bin:$PATH"' >> "$HOME/.bash_profile"
+
+  - name: Copy2
+    shell: echo 'eval "$(rbenv init -)"' >> "$HOME/.bash_profile"
+
+  - name: Copy3
     shell: echo 'export PATH="$HOME/.rbenv/plugins/ruby-build/bin:$PATH"' >> "$HOME/.bash_profile"
 
   - name: command rbenv
-    shell: source "$HOME/.bash_profile"
+    shell: source $HOME/.bash_profile
     args:
       executable: /bin/bash

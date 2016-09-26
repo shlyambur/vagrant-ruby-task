@@ -10,8 +10,9 @@ Vagrant.configure("2") do |config|
     ansible.playbook = "playbook.yml"
     ansible.verbose        = true # logging level (false=minimal; true=v; vvv; vvvv)
     ansible.install        = true # install or not ansible
-#    ansible.limit          = "all" # or only "nodes" group, etc.
+    ansible.limit          = "all" # or only "nodes" group, etc.
 #    ansible.provisioning_path = # ansible file directory default is /vagrant
 #    ansible.inventory_path = "inventory" # affected hosts(nodes) 
  end
+
 end

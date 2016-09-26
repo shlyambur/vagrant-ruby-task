@@ -22,6 +22,8 @@ cp files/* ~/vagrant/node01/
 # Starting and conecting to VM
 cd ~/vagrant/node01
 vagrant up
+set +x
+
 vagrant ssh
 
-set +x
+#set +x
