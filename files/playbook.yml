@@ -1,7 +1,7 @@
 ---
 - hosts: all
   vars:
-    ruby_version: '2.2.3'
+    ruby_version: '2.3.1'
     user: 'vagrant'
     home: '/home/{{ user }}'
     rbenv_root: '{{ home }}/.rbenv'
@@ -43,70 +43,33 @@
   - name: Add eval for rbenv
     shell: echo 'eval "$(rbenv init -)"' >> "{{ rbenv_bash }}"
 
-# This command unfortunatly don't work and near you have launch command 
-# with "PATH=" and use  "args:  executable: /bin/bash" in every task
-# 
-#  - name: Make source for rbenv
-#    shell: source "{{ rbenv_bash }}"
-#    args:
-#      chdir: "{{ home }}"
-#      executable: /bin/bash
-
   - name: Check rbenv instalanion
     shell: 'RBENV_ROOT={{ rbenv_root }} PATH="$RBENV_ROOT/bin:$PATH" rbenv -v'
-#    args:
-#      executable: /bin/bash
 
   - name: Install Ruby with disabling the doc building step
     shell: 'RBENV_ROOT={{ rbenv_root }} PATH="$RBENV_ROOT/bin:$PATH" RUBY_CONFIGURE_OPTS=--disable-install-doc rbenv install -v {{ ruby_version }}'
-#    args:
-#      executable: /bin/bash
 
   - name: Set global the new Ruby {{ ruby_version }}
     shell: 'RBENV_ROOT={{ rbenv_root }} PATH="$RBENV_ROOT/bin:$PATH" rbenv global {{ ruby_version }}'
-#    args:
-#      executable: /bin/bash
 
-#  - name: Check ruby version
-#    shell: 'RBENV_ROOT={{ rbenv_root }} PATH="$RBENV_ROOT/bin:$PATH" ruby -v'
-#    args:
-#      executable: /bin/bash
-
-  - name: Check 2 ruby version
+  - name: Check ruby version
     shell: 'cat "{{ rbenv_root }}/version"'
-#    args:
-#      executable: /bin/bash
 
   - name: rbenv rehash
     shell: 'RBENV_ROOT={{ rbenv_root }} PATH="$RBENV_ROOT/bin:$PATH" rbenv rehash'
-#    args:
-#      executable: /bin/bash
 
   - name: 'create .gemrc'
     lineinfile: 'dest="{{ home }}/.gemrc" line="gem: --no-ri --no-rdoc" create=yes'
 
   - name: Install bundler
     shell: 'RBENV_ROOT={{ rbenv_root }} PATH="$RBENV_ROOT/bin:$PATH" rbenv exec gem install bundler'
-#    args:
-#      executable: /bin/bash
 
   - name: Install Rails
     shell: 'RBENV_ROOT={{ rbenv_root }} PATH="$RBENV_ROOT/bin:$PATH" rbenv exec gem install rails'
-#    args:
-#      executable: /bin/bash
-
-#  - name: rbenv rehash
-#    shell: 'PATH="{{ rbenv_root }}/bin:$PATH" rbenv rehash'
-#    args:
-#      executable: /bin/bash
 
   - name: Check rails version
     shell: 'RBENV_ROOT={{ rbenv_root }} PATH="$RBENV_ROOT/shims:$PATH" rails -v'
-#    args:
-#      executable: /bin/bash
 
   - name: Install Foreman
     shell: 'RBENV_ROOT={{ rbenv_root }} PATH="$RBENV_ROOT/bin:$PATH" rbenv exec gem install foreman'
-#    args:
-#      executable: /bin/bash
 
