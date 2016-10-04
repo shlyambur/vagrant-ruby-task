@@ -17,7 +17,7 @@ fi
 ##cp /files/Vagrantfile  ~/vagrant/node01/Vagrantfile
 ##cp /files/playbook.yml ~/vagrant/node01/playbook.yml
 mkdir -p ~/vagrant/node01
-cp files/* ~/vagrant/node01/
+cp -R files/* ~/vagrant/node01/
 
 # Starting and conecting to VM
 cd ~/vagrant/node01
