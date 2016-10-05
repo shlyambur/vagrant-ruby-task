@@ -87,17 +87,6 @@
     shell: 'RBENV_ROOT={{ rbenv_root }} PATH="$RBENV_ROOT/bin:$PATH" rbenv exec gem install foreman'
 
 ### Install ROR-ecomerce
-  - name: Copy ssh-keys shl4test for bundler working throught ssh (not https)
-    shell: 'cp /vagrant/ssh_keys/* "{{ home }}/.ssh"'
-    sudo: yes
-
-  - name: Make right permissions and owner/group to key file
-    file: 'path={{ home }}/.ssh/shl4test owner={{ user }} group={{ user }} mode=0644'
-    sudo: yes
-
-  - name: Get github server fingerprint
-    shell: 'ssh -o "StrictHostKeyChecking no" git@github.com &> /dev/null'
-
   - name: Install ror-ecommerce application
     git: repo=git://github.com/drhenner/ror_ecommerce.git dest="{{ ror_ecom }}"
 
@@ -105,6 +94,9 @@
     shell: 'cp config/database.yml.sqlite3 config/database.yml'
     args:
       chdir: "{{ ror_ecom }}"
+
+  - name: Uncomment line SQLite3 in Gemfile
+    lineinfile: "dest={{ ror_ecom }}/Gemfile regexp='.gem 'sqlite3'' insertafter='#' line='  gem 'sqlite3'' state=present"
 
   - name: Install ror-ecommerce  dependencies
     apt: name={{ item }} update_cache=yes
@@ -114,10 +106,28 @@
        - libmysqlclient-dev
     sudo: yes
 
+  - name: Copy ssh-key "cert" for bundler working throught ssh (not https) with GitHub
+    shell: 'cp /vagrant/cert "{{ home }}/.ssh"'
+    sudo: yes
+
+  - name: Make right permissions and owner/group to key file
+    file: 'path={{ home }}/.ssh/cert owner={{ user }} group={{ user }} mode=0600'
+    sudo: yes
+
+  - name: Run ssh agent and add key to it
+    shell: 'eval $(ssh-agent -s) && ssh-add "{{ home }}/.ssh/cert"'
+    sudo: yes
+
+  - name: Get github server fingerprint
+    shell: 'ssh -o "StrictHostKeyChecking no" git@github.com &> /dev/null'
+
+#  - name: bundle
+#    shell: bundle install
+#    args:
+#      chdir: "{{ ror_ecom }}"
+
   - name: bundle
-    shell: bundle install
-    args:
-      chdir: "{{ ror_ecom }}"
+    bundler: state=present executable={{ ror_ecom }}/bin/bundle gemfile={{ ror_ecom }}/Gemfile
 
   - name: Get rake encryption key to var 
     shell: 'rake secret'
@@ -128,7 +138,29 @@
   - name: Add encryption_key to settings playbook
     lineinfile: "dest={{ ror_ecom }}/config/settings.yml regexp='^encryption_key:' line='encryption_key: {{ encr_key.stdout }}'"
 
-  - name: uncomment line SQLite3 in Gemfile
-    lineinfile: "dest={{ ror_ecom }}/Gemfile regexp='.gem 'sqlite3'' insertafter='#' line='  gem 'sqlite3'' state=present"
+  - name: rake db:create:all
+    shell: 'rake db:create:all'
+    args:
+      chdir: "{{ ror_ecom }}"
+
+  - name: rake db:migrate db:seed
+    shell: 'rake db:migrate db:seed'
+    args:
+      chdir: "{{ ror_ecom }}"
+
+  - name: RAILS_ENV=test rake db:test:prepare
+    shell: 'RAILS_ENV=test rake db:test:prepare'
+    args:
+      chdir: "{{ ror_ecom }}"
+
+  - name: RAILS_ENV=test rake db:seed
+    shell: 'RAILS_ENV=test rake db:seed'
+    args:
+      chdir: "{{ ror_ecom }}"
+
+  - name: rails server
+    shell: 'rails server'
+    args:
+      chdir: "{{ ror_ecom }}"
 
 
