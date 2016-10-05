@@ -119,17 +119,16 @@
     args:
       chdir: "{{ ror_ecom }}"
 
-  - name: file
+  - name: Get rake encryption key to var 
     shell: 'rake secret'
     args:
       chdir: "{{ ror_ecom }}"
     register: encr_key
 
-  - debug: var=encr_key
-
-  - debug: msg="{{ encr_key.stdout }}"
-
   - name: Add encryption_key to settings playbook
-    lineinfile: 'dest={{ ror_ecom }}/config/settings.yml regexp="^encryption_key:" line="encryption_key: {{ encr_key.stdout }}"'
+    lineinfile: "dest={{ ror_ecom }}/config/settings.yml regexp='^encryption_key:' line='encryption_key: {{ encr_key.stdout }}'"
+
+  - name: uncomment line SQLite3 in Gemfile
+    lineinfile: "dest={{ ror_ecom }}/Gemfile regexp='.gem 'sqlite3'' insertafter='#' line='  gem 'sqlite3'' state=present"
 
 
